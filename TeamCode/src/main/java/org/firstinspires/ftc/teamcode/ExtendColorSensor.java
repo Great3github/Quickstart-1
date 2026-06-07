@@ -9,8 +9,8 @@ public class ExtendColorSensor {
         this.cs = cs;
     }
 
-    public boolean ballPresent(int minValue) {
-        return this.cs.green() >= minValue || this.cs.blue() >= minValue;
+    public boolean ballPresent(int greenVal, int blueVal) {
+        return this.cs.green() >= greenVal || this.cs.blue() >= blueVal;
     }
 
     public int green() {return cs.green();}

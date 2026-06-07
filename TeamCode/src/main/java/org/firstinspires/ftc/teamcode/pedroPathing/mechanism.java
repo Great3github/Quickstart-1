@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.ExtendColorSensor;
 
 import java.util.Hashtable;
 
-@TeleOp(name = "Comp v3.4.3 build T2")
+@TeleOp(name = "Comp26 v3.4.5 build 1")
 public class mechanism extends LinearOpMode {
 // I think blocks is good for testing things out quickly and making quick test programs,
     // but Java is better for the long term projects
@@ -145,8 +145,8 @@ public class mechanism extends LinearOpMode {
                         if (gamepad1.b && System.currentTimeMillis() >= timeSinceMotorSpeedMenuActivate + 500) { // Start motor loop / check if 500ms has passed
                             while (true) {
                                 //DONOTUSE Angle = launchTurn.getPosition();
-                                ((DcMotorEx) leftLaunch).setVelocity(-configSpeedInt * 1750);
-                                ((DcMotorEx) rightLaunch).setVelocity(configSpeedInt * 1750);
+                                ((DcMotorEx) leftLaunch).setVelocity(-configSpeedInt * 1500);
+                                ((DcMotorEx) rightLaunch).setVelocity(configSpeedInt * 1500);
                                 telemetry.addData("Launcher angle", launchTurn.getPosition());
                                 double launchAngle = launchTurn.getPosition();
 //                                if (launchAngle < 0.1) {
@@ -211,7 +211,7 @@ public class mechanism extends LinearOpMode {
                                 }
                                 if (gamepad1.dpad_up && !sensorLiftLimit.isPressed()) { // move lift up
                                     launchPush.setPosition(0.5);
-                                    ((DcMotorEx) liftUp).setVelocity(375);
+                                    ((DcMotorEx) liftUp).setVelocity(360);
                                     goingUp = true;
                                 }
                                 if (goingUp && sensorLiftLimit.isPressed()) {
@@ -220,7 +220,7 @@ public class mechanism extends LinearOpMode {
 
                                 if (gamepad1.dpad_down && !liftTouch.isPressed()) { // move lift down
                                     launchPush.setPosition(0.5);
-                                    ((DcMotorEx) liftUp).setVelocity(-375);
+                                    ((DcMotorEx) liftUp).setVelocity(-360);
                                     goingDown = true;
                                 }
                                 if (goingDown && liftTouch.isPressed()) {
@@ -228,15 +228,18 @@ public class mechanism extends LinearOpMode {
                                 }
 
                                 if (gamepad1.dpad_left) {//intake
-                                    if (!intakeMode && System.currentTimeMillis() >= waitIntakeControl + 1000) {
-                                        intake.setPower(-1);
-                                        intakeMode = true;
-                                        waitIntakeControl = System.currentTimeMillis();
-                                    } else if (intakeMode && System.currentTimeMillis() >= waitIntakeControl + 1000) {
-                                        intake.setPower(0);
-                                        waitIntakeControl = System.currentTimeMillis();
-                                        intakeMode = false;
-                                    }
+//                                    if (!intakeMode && System.currentTimeMillis() >= waitIntakeControl + 1000) {
+//                                        intake.setPower(-1);
+//                                        intakeMode = true;
+//                                        waitIntakeControl = System.currentTimeMillis();
+//                                    } else if (intakeMode && System.currentTimeMillis() >= waitIntakeControl + 1000) {
+//                                        intake.setPower(0);
+//                                        waitIntakeControl = System.currentTimeMillis();
+//                                        intakeMode = false;
+//                                    }
+                                    intake.setPower(-1);
+                                } else {
+                                    intake.setPower(0);
                                 }
                                 Drive();
                                 //intake.setPower(0);
@@ -251,40 +254,39 @@ public class mechanism extends LinearOpMode {
                         telemetry.update();
                     }
                 }
-                if (gamepad1.left_bumper && !ballCheckComplete) { // If left bumper is pressed and states not checked
-                    // ball detected Bottom
-                    ballInElevBottom = sensorIntake.ballPresent(115);
-                    //if ball at top
-                    ballInElevTop = sensorLift.ballPresent(84);
-                    //no balls
-                    ballCheckComplete = true;
-                }
-                if (ballCheckComplete) {//Auton logic
-                    if (!ballInElevBottom && !goingUp && !goingDown) {
-                        intake.setPower(-1);
-                    }
-                    if (liftTouch.isPressed()/* elev at bottom*/ && ballInElevBottom) {
-                        if (!sensorLiftLimit.isPressed()) {
-                            launchPush.setPosition(0.5);
-                            ((DcMotorEx) liftUp).setVelocity(375);
-                            goingUp = true;
-                        }
-                        if (goingUp && sensorLiftLimit.isPressed()) {
-                            ((DcMotorEx) liftUp).setVelocity(0);
-                            goingUp = false;
-                        }
-                        if (!goingUp) {
-                            launchPush.setPosition(0.4);
-                            launchTurn.setPosition(0.5);
-                            liftPush.setPosition(0);
-                            sleep(700);
-                            launchTurn.setPosition(servoPos1);
-                            liftPush.setPosition(0.7);
-                        }
-
-                    }
-                }
-                double launchAngle = launchTurn.getPosition();
+//                if (gamepad1.left_bumper && !ballCheckComplete) { // If left bumper is pressed and states not checked
+//                    // ball detected Bottom
+//                    ballInElevBottom = sensorIntake.ballPresent(115, 115);
+//                    //if ball at top
+//                    ballInElevTop = sensorLift.ballPresent(90, 75);
+//                    //no balls
+//                    ballCheckComplete = true;
+//                }
+//                if (ballCheckComplete) {//Auton logic
+//                    if (!ballInElevBottom && !goingUp && !goingDown) {
+//                        intake.setPower(-1);
+//                    }
+//                    if (liftTouch.isPressed()/* elev at bottom*/ && ballInElevBottom) {
+//                        if (!sensorLiftLimit.isPressed()) {
+//                            launchPush.setPosition(0.5);
+//                            ((DcMotorEx) liftUp).setVelocity(375);
+//                            goingUp = true;
+//                        }
+//                        if (goingUp && sensorLiftLimit.isPressed()) {
+//                            ((DcMotorEx) liftUp).setVelocity(0);
+//                            goingUp = false;
+//                        }
+//                        if (!goingUp) {
+//                            launchPush.setPosition(0.4);
+//                            launchTurn.setPosition(0.5);
+//                            liftPush.setPosition(0);
+//                            sleep(700);
+//                            launchTurn.setPosition(servoPos1);
+//                            liftPush.setPosition(0.7);
+//                        }
+//
+//                    }
+//                }
 //                if (launchAngle <= 0.1) {
 //                    configSpeedInt = 1;
 //                }
@@ -325,7 +327,7 @@ public class mechanism extends LinearOpMode {
                 }
                 if (gamepad1.dpad_up && !sensorLiftLimit.isPressed()) { // lift up
                     launchPush.setPosition(0.5);
-                    ((DcMotorEx) liftUp).setVelocity(375);
+                    ((DcMotorEx) liftUp).setVelocity(360);
                     goingUp = true;
                 }
                 if (goingUp && sensorLiftLimit.isPressed()) {
@@ -334,13 +336,13 @@ public class mechanism extends LinearOpMode {
 
                 if (gamepad1.dpad_down && !liftTouch.isPressed()) { // lift down
                     launchPush.setPosition(0.5);
-                    ((DcMotorEx) liftUp).setVelocity(-375);
+                    ((DcMotorEx) liftUp).setVelocity(-360);
                     goingDown = true;
                 }
                 if (goingDown && liftTouch.isPressed()) {//stop if at limit
                     ((DcMotorEx) liftUp).setVelocity(0);
                 }
-//                if (gamepad1.dpad_left) {
+                if (gamepad1.dpad_left) {
 //                    if (!intakeMode && System.currentTimeMillis() >= waitIntakeControl + 1000) {
 //                        intake.setPower(-1);
 //                        intakeMode = true;
@@ -350,16 +352,21 @@ public class mechanism extends LinearOpMode {
 //                        waitIntakeControl = System.currentTimeMillis();
 //                        intakeMode = false;
 //                    }
-//                }
-                if (!(sensorIntake.ballPresent(115))) {
                     intake.setPower(-1);
+
                 } else {
                     intake.setPower(0);
                 }
+//                if (!(sensorIntake.ballPresent(115))) {
+//                    intake.setPower(-1);
+//                } else {
+//                    intake.setPower(0);
+//                }
                 //intake.setPower(0);
                 while (gamepad1.dpad_right) {//push into launcher
-                    launchPush.setPosition(0.4);
-                    launchTurn.setPosition(0.5);
+                    launchPush.setPosition(0.5);
+                    launchTurn.setPosition(0.6);
+                    sleep(700);
                     liftPush.setPosition(0);
                 }
                 launchTurn.setPosition(servoPos1);
@@ -371,9 +378,9 @@ public class mechanism extends LinearOpMode {
 //                }
                 //liftPush.setPosition(0.7);
                 //boolean pressed = liftTouch.isPressed();
-                if (Boolean.TRUE.equals(states.get("greenBallDetectBottom")) || Boolean.TRUE.equals(states.get("pplBallDetectBottom"))) {
-                    intake.setPower(0);
-                }
+//                if (Boolean.TRUE.equals(states.get("greenBallDetectBottom")) || Boolean.TRUE.equals(states.get("pplBallDetectBottom"))) {
+//                    intake.setPower(0);
+//                }
                 if (liftTouch.isPressed()) {
                     telemetry.addData("liftTouch Status", "Pressed");
                 } else {
@@ -389,9 +396,9 @@ public class mechanism extends LinearOpMode {
                 telemetry.addData("Ball at top", ballInElevTop);
                 telemetry.addData("intake on", intake.getPower() < 0);
                 telemetry.addData("Launcher angle", launchTurn.getPosition());
-                telemetry.addData("ball detected Top", sensorLift.ballPresent(84));
+                telemetry.addData("ball detected Top", sensorLift.ballPresent(90, 75));
 
-                telemetry.addData("ball detected Bottom", sensorIntake.ballPresent(115));
+                telemetry.addData("ball detected Bottom", sensorIntake.ballPresent(115,115));
 
                 telemetry.addData("Launch motor power", ((DcMotorEx) leftLaunch).getVelocity() / 1500);
                 telemetry.update();

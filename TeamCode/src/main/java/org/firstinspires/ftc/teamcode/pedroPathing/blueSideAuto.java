@@ -106,6 +106,7 @@ public class blueSideAuto extends OpMode {
         panelsTelemetry.debug("liftPush", liftPush.getPosition());
         panelsTelemetry.debug("Ball detected Top", sensorLift.green() >=84 || sensorLift.blue() >=84);
         panelsTelemetry.debug("ball detected Bottom", sensorIntake.blue()>=115 || sensorIntake.green()>=115);
+        panelsTelemetry.debug("time waited", waitTime1 + timeZero);
 
         panelsTelemetry.update(telemetry);
     }
@@ -133,7 +134,7 @@ public class blueSideAuto extends OpMode {
                 if (!follower.atParametricEnd()) {pathingState = "atPosition";}
                 break;
             case "atPosition":
-                launcherState = "ballInLauncher";
+                launcherState = "launchBall1";
                 pathingState = "End";
                 break;
             case "End":
@@ -143,10 +144,10 @@ public class blueSideAuto extends OpMode {
             case "End":
                 panelsTelemetry.update(telemetry);
                 break;
-            case "ballInLauncher":
+            case "launchBall1":
                 if (!runOnce) {
-                    ((DcMotorEx) leftLaunch).setVelocity(-1500 * 0.6);
-                    ((DcMotorEx) rightLaunch).setVelocity(1500* 0.6);
+                    ((DcMotorEx) leftLaunch).setVelocity(-1500 * 0.7);
+                    ((DcMotorEx) rightLaunch).setVelocity(1500* 0.7);
                     timeSince1 = System.currentTimeMillis();
                     runOnce = true;
                 }
@@ -162,8 +163,10 @@ public class blueSideAuto extends OpMode {
                         ((DcMotorEx) leftLaunch).setVelocity(0);
                         ((DcMotorEx) rightLaunch).setVelocity(0);
                         launcherFree = true;
-                        launcherState = "End";
-                        liftState = "upBall";
+                        runOnce = false;
+                        runOnce2 = false;
+                        launcherState = "End"; // end launcher
+                        liftState = "upBall"; // transition to ball in elevator up
                         //terminateOpModeNow();
                     }
 
@@ -178,18 +181,18 @@ public class blueSideAuto extends OpMode {
             case "gotoBallInLauncher":
                 runOnce = false;
                 runOnce2 = false;
-                launcherState = "ballInLauncher";
+                launcherState = "launchBall1";
                 break;
         }
         switch (liftState) {
             case "": break;
             case "upBall":
-                if (!(sensorLift.green() >=84 || sensorLift.blue() >=84)) { //if no ball
-                    // No ball to push, so we're done
-                    liftState = "upBall2";
-
-                    break;
-                } else if (returnToEnd) {liftState = ""; launcherState=""; break;}
+//                if (!(sensorLift.green() >=90 || sensorLift.blue() >=75)) { //if no ball
+//                    // No ball to push, so we're done
+//                    liftState = "upBall2";
+//
+//                    break;
+//                } else if (returnToEnd) {}
                 launchPush.setPosition(0.4);
                 liftPush.setPosition(0);
                 launchTurn.setPosition(0.5);
@@ -200,11 +203,11 @@ public class blueSideAuto extends OpMode {
                 break;
             case "upBall2":
                 liftPush.setPosition(0.7);
-                if (!launcherFree && (sensorLift.green() >=84 || sensorLift.blue() >=84)) { // if launcher free + ball
+                if ( (sensorLift.green() >=90 || sensorLift.blue() >=75)) { // if launcher free + ball
                     liftState = "upBall3"; // launch
-                } else if (sensorIntake.blue()>=115 || sensorIntake.green()>=115) {
+                } else if (sensorIntake.blue()>=62 || sensorIntake.green()>=62) {
                     liftState = "goDown-thenUp";
-                } else if (launcherFree && (sensorLift.green() >=84 || sensorLift.blue()>=84)){
+                } else if (launcherFree && (sensorLift.green() >=90 || sensorLift.blue()>=75)){
                     liftState = "upBall";
                 } else {
                     liftState="upBall3-2";
@@ -217,9 +220,7 @@ public class blueSideAuto extends OpMode {
                 break;
             case "upBall3-2":
                 launcherState = "gotoBallInLauncher";
-                returnToEnd=true;
-                liftState = "";
-                break;
+                liftState = ""; launcherState=""; break;
             case "goDown-thenUp":
                 while (!liftTouch.isPressed()) {
                     launchPush.setPosition(0.5);
@@ -227,6 +228,7 @@ public class blueSideAuto extends OpMode {
                 }
                 ((DcMotorEx) liftUp).setVelocity(0);
                 liftState = "goUp-thenPush";
+                break;
             case "goUp-thenPush":
                 while (!sensorLiftLimit.isPressed()) {//Lift until at launch height
 
@@ -235,6 +237,7 @@ public class blueSideAuto extends OpMode {
                 }
                 ((DcMotorEx) liftUp).setVelocity(0); // now carrying ball
                 liftState = "upBall";
+                break;
             case "Wait":
                 if (System.currentTimeMillis() >= waitTime1 + timeZero) {
                     liftState = returnState1;

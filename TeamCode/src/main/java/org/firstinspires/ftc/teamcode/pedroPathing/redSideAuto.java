@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import kotlin._Assertions;
 
 @Autonomous(name = "Auton red side", group = "Autonomous")
-@Configurable // Panels
+//@Configurable // Panels
 
 public class redSideAuto extends OpMode {
     private static final Logger log = LoggerFactory.getLogger(redSideAuto.class);
@@ -149,8 +149,9 @@ public class redSideAuto extends OpMode {
                 break;
             case "ballInLauncher":
                 if (!runOnce) {
-                    ((DcMotorEx) leftLaunch).setVelocity(-1500 * 0.6);
-                    ((DcMotorEx) rightLaunch).setVelocity(1500 * 0.6);
+                    ((DcMotorEx) leftLaunch).setVelocity(-1500 * 0.7);
+                    ((DcMotorEx) rightLaunch).setVelocity(1500 * 0.7);
+                    launchTurn.setPosition(0.5);
                     timeSince1 = System.currentTimeMillis(); // start launch motors and wait 2s
                     runOnce = true;
                 }
@@ -158,16 +159,18 @@ public class redSideAuto extends OpMode {
 
                     if (!runOnce2){
                         launchPush.setPosition(1); //push ball 1 into launcher
-                        timeSince2 = System.currentTimeMillis();
+                        timeSince2 = System.currentTimeMillis(); // reset timer
                         runOnce2 = true;
                     }
-                    if (System.currentTimeMillis() >= timeSince2 + 2000){
+                    if (System.currentTimeMillis() >= timeSince2 + 2000){ //wait 2 seconds to make sure ball is launched
                         //launchPush.setPosition(0.5);
                         ((DcMotorEx) leftLaunch).setVelocity(0);
                         ((DcMotorEx) rightLaunch).setVelocity(0);
                         launcherFree = true;
-                        launcherState = "End";
-                        liftState = "upBall";
+                        runOnce = false;
+                        runOnce2 = false;
+                        launcherState = "End"; // end launcher
+                        liftState = "upBall"; // transition to ball in elevator up
                         //terminateOpModeNow();
                     }
 
@@ -188,12 +191,12 @@ public class redSideAuto extends OpMode {
         switch (liftState) {
             case "": break;
             case "upBall":
-                if (!(sensorLift.green() >=84 || sensorLift.blue() >=84)) { //if no ball
-                    // No ball to push, so we're done
-                    liftState = "upBall2";
-                    
-                    break;
-                } else if (returnToEnd) {liftState = ""; launcherState=""; break;}
+//                if (!(sensorLift.green() >=90 || sensorLift.blue() >=75)) { //if no ball
+//                    // No ball to push, so we're done
+//                    liftState = "upBall2";
+//
+//                    break;
+//                } else if (returnToEnd) {}
                 launchPush.setPosition(0.4);
                 liftPush.setPosition(0);
                 launchTurn.setPosition(0.5);
@@ -221,9 +224,7 @@ public class redSideAuto extends OpMode {
                 break;
             case "upBall3-2":
                 launcherState = "gotoBallInLauncher";
-                returnToEnd=true;
-                liftState = "";
-                break;
+                liftState = ""; launcherState=""; break;
             case "goDown-thenUp":
                 while (!liftTouch.isPressed()) {
                     launchPush.setPosition(0.5);
